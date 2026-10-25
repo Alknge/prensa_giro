@@ -108,7 +108,7 @@ header h1 {
     color: #444;
 }
 
-/* SISTEMA LIGHTBOX COMERCIAL (Página Pública) */
+/* SISTEMA LIGHTBOX COMERCIAL (PÃ¡gina PÃºblica) */
 .modal-flotante {
     display: none;
     position: fixed;
@@ -319,9 +319,9 @@ header h1 {
   
     <header style="background-color: #2c3e50;">
         <h2>Editor Visual de Prensa</h2>
-        <p style="margin:5px 0 0 0; color:#f1c40f;">MODO EDICIÓN ACTIVO - HAGA CLIC DIRECTAMENTE EN LOS TEXTOS O FOTOS</p>
+        <p style="margin:5px 0 0 0; color:#f1c40f;">MODO EDICIÃ“N ACTIVO - HAGA CLIC DIRECTAMENTE EN LOS TEXTOS O FOTOS</p>
         <p>
-        <a href="index.html">? Volver al Login</a>
+        <a href="index.html"><--Volver al Login</a>
       
     
     </header>
@@ -330,7 +330,7 @@ header h1 {
      <!-- PANEL DE CONTROL SUPERIOR INTELIGENTE -->
     <div class="noticia-editor-controles">
         <div class="control-grupo">
-            <label for="fechaEdicion">?? Fecha de la Edición:</label>
+            <label for="fechaEdicion">?? Fecha de la EdiciÃ³n:</label>
             <input type="date" id="fechaEdicion" class="input-comercial">
         </div>
         
@@ -359,7 +359,7 @@ header h1 {
 
 
 <footer class="site-footer" role="contentinfo">
-    &copy; RJ-produción 2026
+    &copy; RJ-produciÃ³n 2026
   </footer>
 
 
@@ -375,10 +375,10 @@ header h1 {
         // 1. CARGA INICIAL DESDE LOCALSTORAGE O GOOGLE SHEETS
         async function cargarInterfazEditora() {
             const hoy = new Date();
-            const año = hoy.getFullYear();
+            const aÃ±o = hoy.getFullYear();
             const mes = String(hoy.getMonth() + 1).padStart(2, '0');
             const dia = String(hoy.getDate()).padStart(2, '0');
-            document.getElementById("fechaEdicion").value = `${año}-${mes}-${dia}`;
+            document.getElementById("fechaEdicion").value = `${aÃ±o}-${mes}-${dia}`;
 
             const respaldoLocal = localStorage.getItem("prensa_edicion_pendiente");
             
@@ -394,20 +394,20 @@ header h1 {
                 const resultado = await respuesta.json();
                 
                 if(resultado.status === "success") {
-                    // Filtrar para el editor las que no estén marcadas como ocultas en la base de datos
+                    // Filtrar para el editor las que no estÃ©n marcadas como ocultas en la base de datos
                     memoriaLocalNoticias = resultado.data.filter(n => n.fecha !== "OCULTO");
                     cantidadFilasMaximasDetectadas = resultado.data.length;
                     localStorage.setItem("prensa_max_filas", cantidadFilasMaximasDetectadas);
                     
                     if(memoriaLocalNoticias.length === 0) {
-                        memoriaLocalNoticias = [{ id: 1, titulo: "Escribe el Título Aquí", subtitulo: "Escribe el Subtítulo", texto: "Escribe el cuerpo de la noticia aquí.", imagen_url: "", fecha: `${dia}/${mes}/${año}` }];
+                        memoriaLocalNoticias = [{ id: 1, titulo: "Escribe el TÃ­tulo AquÃ­", subtitulo: "Escribe el SubtÃ­tulo", texto: "Escribe el cuerpo de la noticia aquÃ­.", imagen_url: "", fecha: `${dia}/${mes}/${aÃ±o}` }];
                         cantidadFilasMaximasDetectadas = 1;
                     }
                     
                     renderizarBloquesEditor();
                 }
             } catch (error) {
-                console.error("Error de conexión:", error);
+                console.error("Error de conexiÃ³n:", error);
             }
         }
 
@@ -415,29 +415,29 @@ header h1 {
             localStorage.setItem("prensa_edicion_pendiente", JSON.stringify(memoriaLocalNoticias));
         }
 
-        // 2. GENERACIÓN POR LOTES EXACTOS
+        // 2. GENERACIÃ“N POR LOTES EXACTOS
         function generarCuadrosEdicion() {
             const inputCantidad = document.getElementById("cantidadNoticias");
             const inputFecha = document.getElementById("fechaEdicion");
             
             const cantidad = parseInt(inputCantidad.value) || 0;
             if (cantidad <= 0 || !inputFecha.value) {
-                alert("Introduce una cantidad y fecha válidas.");
+                alert("Introduce una cantidad y fecha vÃ¡lidas.");
                 return;
             }
 
             const partesFecha = inputFecha.value.split("-");
             const fechaFormateadaParaSheets = `${parseInt(partesFecha[2])}/${parseInt(partesFecha[1])}/${partesFecha[0]}`;
 
-            if (confirm(`¿Quieres limpiar el editor y preparar exactamente ${cantidad} cuadros?`)) {
+            if (confirm(`Â¿Quieres limpiar el editor y preparar exactamente ${cantidad} cuadros?`)) {
                 memoriaLocalNoticias = []; 
                 
                 for (let i = 1; i <= cantidad; i++) {
                     memoriaLocalNoticias.push({
                         id: i, 
-                        titulo: `Título de la Noticia ${i}`,
-                        subtitulo: "Subtítulo correspondiente",
-                        texto: "Cuerpo o texto descriptivo aquí.",
+                        titulo: `TÃ­tulo de la Noticia ${i}`,
+                        subtitulo: "SubtÃ­tulo correspondiente",
+                        texto: "Cuerpo o texto descriptivo aquÃ­.",
                         imagen_url: "",
                         fecha: fechaFormateadaParaSheets 
                     });
@@ -474,9 +474,9 @@ header h1 {
             });
         }
 
-        // 4. TRUCO DE ELIMINACIÓN INDIVIDUAL (Reestructura la lista en pantalla de forma secuencial)
+        // 4. TRUCO DE ELIMINACIÃ“N INDIVIDUAL (Reestructura la lista en pantalla de forma secuencial)
         function eliminarBloqueNoticia(index) {
-            if (confirm("¿Deseas eliminar este cuadro de la visualización?")) {
+            if (confirm("Â¿Deseas eliminar este cuadro de la visualizaciÃ³n?")) {
                 memoriaLocalNoticias.splice(index, 1);
                 
                 // Re-ordenar los IDs secuencialmente para mantener la pulcritud
@@ -493,7 +493,7 @@ header h1 {
             memoriaLocalNoticias[index][campo] = valor.trim();
             guardarCopiaSeguridadLocal(); 
         }
-                // 5. COMPRESOR AUTOMÁTICO COMERCIAL (Optimizado para procesar un archivo individual)
+                // 5. COMPRESOR AUTOMÃTICO COMERCIAL (Optimizado para procesar un archivo individual)
         function procesarYComprimirFoto(evento, index) {
             const archivo = evento.target.files[0];
             if (!archivo) return;
@@ -531,10 +531,10 @@ header h1 {
             lector.readAsDataURL(archivo);
         }
 
-        // 6. ACCIÓN DEL BOTÓN ROJO GRANDE: AJUSTADO CON MARCA DE BORRADO DE SEGURIDAD
+        // 6. ACCIÃ“N DEL BOTÃ“N ROJO GRANDE: AJUSTADO CON MARCA DE BORRADO DE SEGURIDAD
         async function guardarTodoElPeriodico() {
             const boton = document.querySelector(".boton-guardar-cambios");
-            const textoOriginal = boton ? boton.innerText : "Publicar Edición Global";
+            const textoOriginal = boton ? boton.innerText : "Publicar EdiciÃ³n Global";
             
             if (boton) {
                 boton.innerText = "Sincronizando con la Nube... Por favor espere";
@@ -554,11 +554,11 @@ header h1 {
                         subtitulo: "",
                         texto: "",
                         imagen_url: "",
-                        fecha: "OCULTO" // Señal secreta que interceptará la página pública
+                        fecha: "OCULTO" // SeÃ±al secreta que interceptarÃ¡ la pÃ¡gina pÃºblica
                     });
                 }
 
-                // Sincronización clásica uno por uno aceptada por tu Apps Script
+                // SincronizaciÃ³n clÃ¡sica uno por uno aceptada por tu Apps Script
                 for (let noticia of paqueteDeSubida) {
                     const payload = {
                         id: noticia.id,
@@ -587,10 +587,10 @@ header h1 {
                 localStorage.removeItem("prensa_edicion_pendiente");
                 localStorage.removeItem("prensa_max_filas");
                 
-                alert("¡Éxito Comercial! El lote del periódico se ha actualizado. Los cuadros eliminados han sido desactivados.");
+                alert("Â¡Ã‰xito Comercial! El lote del periÃ³dico se ha actualizado. Los cuadros eliminados han sido desactivados.");
                 location.reload();
             } catch (error) {
-                alert("Surgió un detalle al guardar los cambios: " + error.message);
+                alert("SurgiÃ³ un detalle al guardar los cambios: " + error.message);
             } finally {
                 if (boton) {
                     boton.innerText = textoOriginal;
