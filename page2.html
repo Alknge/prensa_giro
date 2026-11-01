@@ -261,7 +261,75 @@ header h1 {
         }
         
         
-        
+
+
+
+
+
+
+
+
+
+
+       /* Botón de Voz Automático abajo a la izquierda */
+#btn-voz-fijo {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    z-index: 100000;
+    background: #2a5356;
+    border: 2px solid #ffd700;
+    color: white;
+    padding: 10px 14px;
+    border-radius: 50px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 0.9rem;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: transform 0.1s;
+}
+#btn-voz-fijo:active {
+    transform: scale(0.95);
+}
+
+/* Contenedor Flotante de la Foto del Periódico */
+.modal-periodico {
+    display: none; /* Se activa por JS */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+.modal-contenido {
+    max-width: 90%;
+    max-height: 80vh;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    border: 2px solid rgba(255,255,255,0.2);
+}
+.btn-cerrar-modal {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: #ff4500;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+}
+       
         
         
         
@@ -590,7 +658,141 @@ header h1 {
         
         
         
-        
+
+
+
+
+
+
+
+
+
+        <!-- Importación del motor de reconocimiento visual de imágenes (OCR) -->
+<script src="https://jsdelivr.net"></script>
+
+<script>
+    let vozSilenciada = false;
+
+    // 1. Crear dinámicamente el botón en la parte inferior izquierda desde JS
+    function crearBotónVoz() {
+        const boton = document.createElement('button');
+        boton.id = 'btn-voz-fijo';
+        boton.innerHTML = '<span id="ico-v">🔊</span> <span id="txt-v">Voz Activa</span>';
+        boton.onclick = alternarVoz;
+        document.body.appendChild(boton);
+    }
+
+    // Motor de audio
+    function emitirVozPrensa(mensaje) {
+        if (vozSilenciada) return;
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const discurso = new SpeechSynthesisUtterance(mensaje);
+            discurso.lang = 'es-VE';
+            discurso.rate = 0.95;
+            window.speechSynthesis.speak(discurso);
+        }
+    }
+
+    function alternarVoz() {
+        vozSilenciada = !vozSilenciada;
+        const ico = document.getElementById('ico-v');
+        const txt = document.getElementById('txt-v');
+        const btn = document.getElementById('btn-voz-fijo');
+
+        if (vozSilenciada) {
+            window.speechSynthesis.cancel();
+            if(ico) ico.textContent = "🔇";
+            if(txt) txt.textContent = "Silenciado";
+            if(btn) btn.style.opacity = "0.7";
+        } else {
+            if(ico) ico.textContent = "🔊";
+            if(txt) txt.textContent = "Voz Activa";
+            if(btn) btn.style.opacity = "1";
+            emitirVozPrensa("Bienvenidos al Periódico Giro. El círculo de la información veraz.");
+        }
+    }
+
+    // Monitoreo de Red
+    function monitorearRed(avisarIngreso = false) {
+        if (navigator.onLine) {
+            if (avisarIngreso) {
+                setTimeout(() => {
+                    emitirVozPrensa("Bienvenidos al Periódico Giro. El círculo de la información veraz. Aplicación conectada exitosamente a la base de datos.");
+                }, 800);
+            } else {
+                emitirVozPrensa("Aplicación en línea. Conexión restaurada con la base de datos.");
+            }
+        } else {
+            emitirVozPrensa("Atención. Aplicación no conectada a internet. Verifique su red.");
+        }
+    }
+
+    // 2. ESCANER DE IMÁGENES (OCR) AL ABRIR LA FOTO FLOTANTE
+    function procesarYLeerImagen(urlImagen) {
+        emitirVozPrensa("Analizando el texto de la imagen del periódico, por favor espere...");
+
+        // Ejecuta el escaneo de Tesseract en español
+        Tesseract.recognize(
+            urlImagen,
+            'spa',
+            { logger: m => console.log(m) } // Barra de progreso interna en consola
+        ).then(({ data: { text } }) => {
+            // Si logró extraer texto de la foto, lo lee en voz alta
+            if (text && text.trim().length > 5) {
+                emitirVozPrensa("Lectura de la edición de hoy: " + text);
+            } else {
+                emitirVozPrensa("No se logró percibir un texto legible en la imagen de esta noticia.");
+            }
+        }).catch(err => {
+            console.error(err);
+            emitirVozPrensa("Error al intentar procesar la imagen del periódico.");
+        });
+    }
+
+    // Inicialización del ecosistema
+    document.addEventListener("DOMContentLoaded", () => {
+        crearBotónVoz();
+        monitorearRed(true);
+
+        window.addEventListener('online', () => monitorearRed(false));
+        window.addEventListener('offline', () => monitorearRed(false));
+
+        // 3. Crear el contenedor flotante de la foto dinámicamente si no existe
+        const modal = document.createElement('div');
+        modal.className = 'modal-periodico';
+        modal.id = 'miModalPeriodico';
+        modal.innerHTML = `
+            <button class="btn-cerrar-modal" onclick="cerrarContenedorFlotante()">❌ Cerrar</button>
+            <img class="modal-contenido" id="imgModalFlotante" src="" alt="Periódico">
+        `;
+        document.body.appendChild(modal);
+
+        // 4. Detectar automáticamente clics en CUALQUIER imagen del periódico
+        document.querySelectorAll('img').forEach(imagen => {
+            // Evitamos que el logo principal active la lectura
+            if (!imagen.src.includes('logo')) {
+                imagen.style.cursor = 'pointer';
+                imagen.addEventListener('click', () => {
+                    abrirContenedorFlotante(imagen.src);
+                });
+            }
+        });
+    });
+
+    function abrirContenedorFlotante(src) {
+        document.getElementById('imgModalFlotante').src = src;
+        document.getElementById('miModalPeriodico').style.display = 'flex';
+        // Activa el escáner de voz de la foto abierta
+        procesarYLeerImagen(src);
+    }
+
+    function cerrarContenedorFlotante() {
+        document.getElementById('miModalPeriodico').style.display = 'none';
+        window.speechSynthesis.cancel(); // Detiene la lectura inmediatamente al cerrar
+    }
+
+    
         
         
         
